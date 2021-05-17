@@ -1,6 +1,9 @@
 package stockwatcher;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -11,9 +14,11 @@ import javax.servlet.annotation.WebServlet;
 @WebServlet("/stockwatcher/greet")
 public class GreetingServiceImpl extends RemoteServiceServlet implements GreetingService {
 	
-	public GreetingResponse greetServer(String input) throws IllegalArgumentException {
+	public GreetingResponse greetServer(@RequestParam("file") MultipartFile file,
+										RedirectAttributes redirectAttributes) throws IllegalArgumentException {
 		// Verify that the input is valid.
-		if (!FieldVerifier.isValidName(input)) {
+		System.out.println("greetServer is called!");
+		if (!FieldVerifier.isValidName(file.getName())) {
 			// If the input is not valid, throw an IllegalArgumentException back to
 			// the client.
 			throw new IllegalArgumentException(
@@ -25,7 +30,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 		response.setServerInfo(getServletContext().getServerInfo());
 		response.setUserAgent(getThreadLocalRequest().getHeader("User-Agent"));
 		
-		response.setGreeting("Hello, " + input + "!");
+		response.setGreeting("Hello, " + file.getName() + "!");
 		
 		return response;
 	}
