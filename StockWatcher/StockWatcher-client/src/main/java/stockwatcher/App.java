@@ -9,18 +9,14 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.*;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class App implements EntryPoint {
+	private final CwConstants constants = (CwConstants) GWT.create(CwConstants.class);;
+
 	/**
 	 * The message displayed to the user when the server cannot be reached or
 	 * returns an error.
@@ -39,9 +35,10 @@ public class App implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		final Button sendButton = new Button("Send");
-		final TextBox nameField = new TextBox();
-		nameField.setText("GWT User");
+		// Add a file upload widget
+		final FileUpload fileUpload = new FileUpload();
+		fileUpload.ensureDebugId("cwFileUpload");
+		final Button sendButton = new Button(constants.cwFileUploadButton());
 		final Label errorLabel = new Label();
 
 		// We can add style names to widgets
@@ -49,13 +46,12 @@ public class App implements EntryPoint {
 
 		// Add the nameField and sendButton to the RootPanel
 		// Use RootPanel.get() to get the entire body element
-		RootPanel.get("nameFieldContainer").add(nameField);
+		RootPanel.get("nameFieldContainer").add(fileUpload);
 		RootPanel.get("sendButtonContainer").add(sendButton);
 		RootPanel.get("errorLabelContainer").add(errorLabel);
 
 		// Focus the cursor on the name field when the app loads
-		nameField.setFocus(true);
-		nameField.selectAll();
+		fileUpload.setFocus(true);
 
 		// Create the popup dialog box
 		final DialogBox dialogBox = new DialogBox();
@@ -107,19 +103,10 @@ public class App implements EntryPoint {
 			 * Send the name from the nameField to the server and wait for a response.
 			 */
 			private void sendNameToServer() {
-				// First, we validate the input.
-				errorLabel.setText("");
-				String textToServer = nameField.getText();
-				if (!FieldVerifier.isValidName(textToServer)) {
-					errorLabel.setText("Please enter at least four characters");
-					return;
-				}
-
 				// Then, we send the input to the server.
 				sendButton.setEnabled(false);
-				textToServerLabel.setText(textToServer);
 				serverResponseLabel.setText("");
-				greetingService.greetServer(textToServer,
+				greetingService.greetServer("textToServer",
 						new AsyncCallback<GreetingResponse>() {
 							public void onFailure(Throwable caught) {
 								// Show the RPC error message to the user
@@ -153,6 +140,5 @@ public class App implements EntryPoint {
 		// Add a handler to send the name to the server
 		MyHandler handler = new MyHandler();
 		sendButton.addClickHandler(handler);
-		nameField.addKeyUpHandler(handler);
 	}
 }
